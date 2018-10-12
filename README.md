@@ -19,9 +19,9 @@ Operations for work with templated doubly linked list
 * Remove (**O(n)**)
 
 ### Sorting:
-* BubleSort (**O(n<sup>2</sup>))
+* BubleSort (**O(n<sup>2</sup>)**)
 * SelectionSort (**O(n<sup>2</sup>)**)
-* InsertionSort (**O(n<sup>2</sup>))
+* InsertionSort (**O(n<sup>2</sup>)**)
 * MergeSort (**O(n log n)**)
 * QuickSort (**O(n log n)**)
 

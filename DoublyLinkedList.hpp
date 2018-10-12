@@ -28,6 +28,9 @@ public:
 	T& GetLast(); // получение последнего элемента списка: O(1)
 	T& Get(int index); // получение элемента по индексу: O(N)
 
+	T GetMin() const; // получение минимума
+	T GetMax() const; // получение максимума
+
 	void AddFront(const T& value); // добавление в начало списка: O(1)
 	void AddBack(const T& value); // добавление в конец списка: O(1)
 	void InsertAt(int index, const T& value); // добавление в произвольное место списка: O(N)
@@ -38,10 +41,13 @@ public:
 	void Remove(const T& value); // удаление элементов равных value: O(N)
 
 	void BubleSort(); // сортировка пузырьком
-	void SelectionSort(); // ортировка выбором (минимума)
+	void SelectionSort(); // сортировка выбором (минимума)
 	void InsertionSort(); // сортировка вставками
 	void MergeSort(); // сортировка слияниями
 	void QuickSort(); // быстрая сортировка
+
+	void Reverse(); // перестановка списка в обратном порядке
+	void Swap(int index1, int index2); // переставить элементы с индексами index1 и index2 местами
 
 	void Print() const; // печать списка с начала
 	void PrintBackward() const; // печать списка с конца
@@ -142,6 +148,44 @@ T& DoublyLinkedList<T>::Get(int index) {
 	}
 
 	return node->value; // возвращаем его значение
+}
+
+template <typename T>
+T DoublyLinkedList<T>::GetMin() const {
+	if (IsEmpty())
+		throw "DoublyLinkedList::GetMin(): list is empty";
+
+	T min = head->value;
+
+	Node *node = head->next;
+
+	while (node) {
+		if (node->value < min)
+			min = node->value;
+
+		node = node->next;
+	}
+
+	return min;
+}
+
+template <typename T>
+T DoublyLinkedList<T>::GetMax() const {
+	if (IsEmpty())
+		throw "DoublyLinkedList::GetMax(): list is empty";
+
+	T max = head->value;
+
+	Node *node = head->next;
+
+	while (node) {
+		if (node->value > max)
+			max = node->value;
+
+		node = node->next;
+	}
+
+	return max;
 }
 
 template <typename T>
@@ -626,6 +670,141 @@ void DoublyLinkedList<T>::QuickSort(int first, int last, Node* &firstNode, Node*
 template <typename T>
 void DoublyLinkedList<T>::QuickSort() {
 	QuickSort(0, length - 1, head, tail);
+}
+
+template <typename T>
+void DoublyLinkedList<T>::Reverse() {
+	Node *node1 = head;
+	Node *node2 = tail;
+
+	while (node1 != node2 && node1->next != node2) {
+		Node *next1 = node1->next;
+		Node *prev1 = node1->prev;
+
+		Node *next2 = node2->next;
+		Node *prev2 = node2->prev;
+
+		if (next2) {
+			next2->prev = node1;
+		}
+		else {
+			head = node2;
+		}
+
+		if (prev1) {
+			prev1->next = node2;
+		}
+		else {
+			tail = node1;
+		}
+
+		next1->prev = node2;
+		prev2->next = node1;
+
+		node1->next = next2;
+		node1->prev = prev2;
+
+		node2->next = next1;
+		node2->prev = prev1;
+
+		node1 = next1;
+		node2 = prev2;
+	}
+}
+
+template <typename T>
+void DoublyLinkedList<T>::Swap(int index1, int index2) {
+	if (index1 < 0 || index1 >= length)
+		throw "DoublyLinkedList<T>::Swap(int index1, int index2): index1 out of bounds";
+
+	if (index2 < 0 || index2 >= length)
+		throw "DoublyLinkedList<T>::Swap(int index1, int index2): index2 out of bounds";
+
+	if (index1 == index2)
+		return;
+
+	Node *node1 = head;
+	Node *node2 = head;
+
+	if (index2 < index1) {
+		int tmp = index1;
+		index1 = index2;
+		index2 = tmp;
+	}
+
+	int index = 0;
+
+	while (index < index1 && index < index2) {
+		index++;
+
+		node1 = node1->next;
+		node2 = node2->next;
+	}
+
+	while (index < index1) {
+		index++;
+		node1 = node1->next;
+	}
+
+	while (index < index2) {
+		index++;
+		node2 = node2->next;
+	}
+
+	if (index1 == index2 - 1) {
+		Node *prev = node1->prev;
+		Node *next = node2->next;
+
+		node1->next = next;
+		node1->prev = node2;
+
+		node2->next = node1;
+		node2->prev = prev;
+
+		if (node1 == head) {
+			head = node2;
+		}
+		else {
+			prev->next = node2;
+		}
+
+		if (node2 == tail) {
+			tail = node1;
+		}
+		else {
+			next->prev = node1;
+		}
+	}
+	else {
+		Node *prev1 = node1->prev;
+		Node *next1 = node1->next;
+
+		Node *prev2 = node2->prev;
+		Node *next2 = node2->next;
+
+		node1->next = next2;
+		node1->prev = prev2;
+
+		node2->next = next1;
+		node2->prev = prev1;
+
+		if (node1 == head) {
+			head = node2;
+		}
+		else {
+			prev1->next = node2;
+		}
+
+		next1->prev = node2;
+		prev2->next = node1;
+
+		if (node2 == tail) {
+			tail = node1;
+		}
+		else {
+			next2->prev = node1;
+		}
+	}
 }
 
 template <typename T>

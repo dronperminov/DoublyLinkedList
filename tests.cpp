@@ -543,6 +543,83 @@ void QuickSortTests() {
 	cout << "OK" << endl;
 }
 
+void FunctionsTests() {
+	cout << "FunctionsTests:" << endl;
+
+	DoublyLinkedList<int> list;
+
+	list.AddBack(1);
+
+	assert(list.GetMin() == 1);
+	assert(list.GetMax() == 1);
+
+	list.AddBack(2);
+
+	assert(list.GetMin() == 1);
+	assert(list.GetMax() == 2);
+
+	list.AddBack(0);
+
+	assert(list.GetMin() == 0);
+	assert(list.GetMax() == 2);
+
+	list = GetList(1, 1);
+	
+	assert(list.Get(0) == 1);
+	list.Reverse();
+	assert(list.Get(0) == 1);
+
+	list = GetList(5, 1);
+
+	assert(list.Get(0) == 5);
+	assert(list.Get(1) == 4);
+	assert(list.Get(2) == 3);
+	assert(list.Get(3) == 2);
+	assert(list.Get(4) == 1);
+
+	list.Reverse();
+
+	assert(list.Get(0) == 1);
+	assert(list.Get(1) == 2);
+	assert(list.Get(2) == 3);
+	assert(list.Get(3) == 4);
+	assert(list.Get(4) == 5);
+
+	list.Swap(2, 3);
+
+	assert(list.Get(0) == 1);
+	assert(list.Get(1) == 2);
+	assert(list.Get(2) == 4);
+	assert(list.Get(3) == 3);
+	assert(list.Get(4) == 5);
+
+	list.Swap(0, 3);
+
+	assert(list.Get(0) == 3);
+	assert(list.Get(1) == 2);
+	assert(list.Get(2) == 4);
+	assert(list.Get(3) == 1);
+	assert(list.Get(4) == 5);
+
+	list.Swap(4, 1);
+
+	assert(list.Get(0) == 3);
+	assert(list.Get(1) == 5);
+	assert(list.Get(2) == 4);
+	assert(list.Get(3) == 1);
+	assert(list.Get(4) == 2);
+
+	list.Swap(0, 4);
+
+	assert(list.Get(0) == 2);
+	assert(list.Get(1) == 5);
+	assert(list.Get(2) == 4);
+	assert(list.Get(3) == 1);
+	assert(list.Get(4) == 3);
+
+
+	cout << "OK" << endl;
+}
 
 int main() {
 	AddFrontTests();
@@ -560,4 +637,6 @@ int main() {
 	InsertionSortTests();
 	MergeSortTests();
 	QuickSortTests();
+
+	FunctionsTests();
 }

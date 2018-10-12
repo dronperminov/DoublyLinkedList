@@ -14,12 +14,15 @@ class DoublyLinkedList {
 
 	int length; // количество элементов списка
 
+	void QuickSort(int first, int last, Node* &firstNode, Node* &lastNode);
+
 public:
 	DoublyLinkedList(); // конструктор по умолчанию
 	DoublyLinkedList(const DoublyLinkedList<T> &list); // конструктор копирования
 
-	bool IsEmpty() const; // проверка списка на пустоту
 	int Length() const; // получение длины списка
+	bool IsEmpty() const; // проверка списка на пустоту
+	bool IsSorted() const; // проверка на упорядоченность (по неубыванию)
 
 	T& GetFirst(); // получение первого элемента списка: O(1)
 	T& GetLast(); // получение последнего элемента списка: O(1)
@@ -33,6 +36,12 @@ public:
 	void RemoveBack(); // удаление с конца списка: O(1)
 	void RemoveAt(int index); // удаление по индексу: O(N)
 	void Remove(const T& value); // удаление элементов равных value: O(N)
+
+	void BubleSort(); // сортировка пузырьком
+	void SelectionSort(); // ортировка выбором (минимума)
+	void InsertionSort(); // сортировка вставками
+	void MergeSort(); // сортировка слияниями
+	void QuickSort(); // быстрая сортировка
 
 	void Print() const; // печать списка с начала
 	void PrintBackward() const; // печать списка с конца
@@ -78,13 +87,26 @@ DoublyLinkedList<T>::DoublyLinkedList(const DoublyLinkedList<T> &list) {
 }
 
 template <typename T>
+int DoublyLinkedList<T>::Length() const {
+	return length;
+}
+
+template <typename T>
 bool DoublyLinkedList<T>::IsEmpty() const {
 	return length == 0;
 }
 
 template <typename T>
-int DoublyLinkedList<T>::Length() const {
-	return length;
+bool DoublyLinkedList<T>::IsSorted() const {
+	if (IsEmpty())
+		return false; // пустой список не является упорядоченным
+
+	Node *node = head;
+
+	while (node->next && node->value <= node->next->value)
+		node = node->next;
+
+	return node->next == nullptr;
 }
 
 template <typename T>
@@ -132,7 +154,7 @@ void DoublyLinkedList<T>::AddFront(const T& value) {
 
 	// если список пуст
 	if (head == nullptr) {
-		tail = node; // то хвост списка является этим элементом
+		tail = node; // то конец списка является этим элементом
 	}
 	else {		
 		head->prev = node; // иначе вставляем в начало
@@ -186,7 +208,7 @@ void DoublyLinkedList<T>::InsertAt(int index, const T& value) {
 	// создаём новый элемент и вставляем его
 	Node *node = new Node;
 
-	// обновляем ссылку хвоста, если нужно
+	// обновляем ссылку конца, если нужно
 	if (prev->next == tail)
 		tail->prev = node;
 
@@ -314,6 +336,296 @@ void DoublyLinkedList<T>::Remove(const T& value) {
 		prev = node;
 		node = node->next; // переходим к следующему элементу
 	}
+}
+
+template <typename T>
+void DoublyLinkedList<T>::BubleSort() {
+	bool isSorted = false; // флаг отсортированности
+
+	// повторяем, пока не станет отсортирован
+	while (!isSorted) {
+		isSorted = true; // считаем, что отсортирован
+
+		Node *node = head; // идём от начала списка
+
+		// и до конца списка
+		while (node->next) {
+			Node *l1 = node;
+			Node *l2 = node->next;
+
+			// если элементы стоят в неправильном порядке, то переставляем их
+			if (l1->value > l2->value) {
+				Node *prev = l1->prev;
+				Node *next = l2->next;
+
+				l1->prev = l2;
+				l1->next = next;
+
+				l2->prev = prev;
+				l2->next = l1;
+
+				if (l1 == head) {
+					head = l2;
+					next->prev = l1;
+				}
+				else if (l2 == tail) {
+					tail = l1;
+					prev->next = l2;
+				}
+				else {
+					prev->next = l2;
+					next->prev = l1;
+				}
+
+				isSorted = false; // не отсортирован, так как была перестановка
+			}
+			else
+				node = node->next; // переходим к следующему элементу
+		}
+	}
+}
+
+template <typename T>
+void DoublyLinkedList<T>::SelectionSort() {
+	Node *node = head;
+
+	while (node->next) {
+		Node *min = node;
+		Node *tmp = node->next;
+
+		// ищем минимальный элемент списка
+		while (tmp) {
+			if (tmp->value < min->value) 
+				min = tmp;
+
+			tmp = tmp->next;
+		}
+
+		// если минимум и так на своём месте
+		if (node == min) {
+			node = node->next; // то переходим к следующему элементу
+		}
+		else { // иначе вставляем минимум на нужное место
+			if (node == head) {
+				head = min;
+			}
+			else {
+				node->prev->next = min;
+			}
+
+			if (min == tail) {
+				tail = node;
+			}
+			else {
+				min->next->prev = node;
+			}
+
+			// если минимум идёт за текущим элементом
+			if (node->next == min) {
+				Node *prev = node->prev;
+				Node *next = min->next;
+
+				min->next = node;
+				min->prev = prev;
+
+				node->next = next;
+				node->prev = min;
+			}
+			else { // иначе если текущий элемент и минимум далеко друг от друга
+				Node *prev1 = node->prev;
+				Node *next1 = node->next;
+
+				Node *prev2 = min->prev;
+				Node *next2 = min->next;
+
+				node->next = next2;
+				node->prev = prev2;
+
+				min->next = next1;
+				min->prev = prev1;
+
+				prev2->next = node;
+				next1->prev = min;
+
+				node = next1;
+			}
+		}
+	}
+}
+
+template <typename T>
+void DoublyLinkedList<T>::InsertionSort() {
+	Node *node = head->next;
+
+	while (node) {
+		Node *tmp = node;
+
+		Node *prev = node->prev;
+		Node *next = node->next;
+
+		prev->next = next;
+
+		if (node != tail) {
+			next->prev = prev;
+		}
+		else {
+			tail = prev;
+		}
+
+		Node *elem = prev;
+
+		// ищем место для вставки элемента
+		while (elem && elem->value > tmp->value)
+			elem = elem->prev;
+
+		node->prev = elem;
+
+		// и вставляем
+		if (elem == nullptr) { // если дошли до начала, то вставляем в начало
+			node->next = head;
+			head->prev = node;
+
+			head = node;
+		}
+		else {
+			if (elem == tail) { // если в конце
+				tail = node; // то конец указывает на текущий элемент
+			}
+			else { // иначе вставляем в середину
+				node->next = elem->next;
+				elem->next->prev = node;
+			}
+
+			elem->next = node;
+		}
+
+		node = tmp->next; // переходим к следующему элементу
+	}
+}
+
+template <typename T>
+void DoublyLinkedList<T>::MergeSort() {
+	if (length < 2)
+		return; // если список пуст или из 1 элемента, то выходим
+
+	// списки для левой и правой половины
+	DoublyLinkedList<T> left;
+	DoublyLinkedList<T> right;
+
+	int index = 0;
+	Node *tmp = head;
+
+	// записываем левую половину списка в левый список
+	while (index < length / 2) {
+		left.AddBack(tmp->value);
+
+		index++;
+		tmp = tmp->next;
+	}
+	
+	// записываем правую половину списка в правый список
+	while (index < length) {
+		right.AddBack(tmp->value);
+
+		index++;
+		tmp = tmp->next;
+	}
+
+	// рекурсивно выполняем сортировку подсписков
+	left.MergeSort();
+	right.MergeSort();
+
+	tmp = head;
+
+	// выполняем слияние подсписков в список
+	while (!left.IsEmpty() && !right.IsEmpty()) {
+		T value1 = left.GetFirst();
+		T value2 = right.GetFirst();
+
+		if (value1 < value2) {
+			tmp->value = value1;
+			left.RemoveFront();
+		}
+		else {
+			tmp->value = value2;
+			right.RemoveFront();
+		}
+
+		tmp = tmp->next;
+	}
+
+	// дозаписываем из левого подсписка
+	while (!left.IsEmpty()) {
+		tmp->value = left.GetFirst();
+		left.RemoveFront();
+
+		tmp = tmp->next;
+	}
+
+	// дозаписываем из правого подсписка
+	while (!right.IsEmpty()) {
+		tmp->value = right.GetFirst();
+		right.RemoveFront();
+
+		tmp = tmp->next;
+	}
+}
+
+template <typename T>
+void DoublyLinkedList<T>::QuickSort(int first, int last, Node* &firstNode, Node* &lastNode) {
+	if (first >= last)
+		return;
+
+	int left = first;
+	int right = last;
+
+	Node *leftNode = firstNode;
+	Node *rightNode = lastNode;
+
+	Node *node1 = firstNode;
+	Node *node2 = lastNode;
+
+	// ищем середину подсписка
+	while (node1 != node2 && node1->next != node2) {
+		node1 = node1->next;
+		node2 = node2->prev;
+	}
+
+	T middle = node1->value; // запоминаем значение из серидины
+
+	// выполняем разделение
+	while (left <= right) {
+		while (leftNode->value < middle) {
+			left++;
+			leftNode = leftNode->next;
+		}
+
+		while (rightNode->value > middle) {
+			right--;
+			rightNode = rightNode->prev;
+		}
+
+		if (left <= right) {
+			T tmp = leftNode->value;
+			leftNode->value = rightNode->value;
+			rightNode->value = tmp;
+
+			leftNode = leftNode->next;
+			rightNode = rightNode->prev;
+
+			left++;
+			right--;
+		}
+	}
+
+	// запускаем рекурсивно для двух подсписков
+	QuickSort(first, right, firstNode, rightNode);
+	QuickSort(left, last, leftNode, lastNode);
+}
+
+template <typename T>
+void DoublyLinkedList<T>::QuickSort() {
+	QuickSort(0, length - 1, head, tail);
 }
 
 template <typename T>

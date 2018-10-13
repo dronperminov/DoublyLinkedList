@@ -204,7 +204,7 @@ void DoublyLinkedList<T>::AddFront(const T& value) {
 		head->prev = node; // иначе вставляем в начало
 	}
 
-	head = node; // обновляем началос писка
+	head = node; // обновляем начало списка
 
 	length++; // увеличиваем длину
 }
@@ -384,6 +384,9 @@ void DoublyLinkedList<T>::Remove(const T& value) {
 
 template <typename T>
 void DoublyLinkedList<T>::BubleSort() {
+	if (length < 2)
+		return;
+
 	bool isSorted = false; // флаг отсортированности
 
 	// повторяем, пока не станет отсортирован
@@ -431,6 +434,9 @@ void DoublyLinkedList<T>::BubleSort() {
 
 template <typename T>
 void DoublyLinkedList<T>::SelectionSort() {
+	if (length < 2)
+		return;
+
 	Node *node = head;
 
 	while (node->next) {
@@ -499,6 +505,9 @@ void DoublyLinkedList<T>::SelectionSort() {
 
 template <typename T>
 void DoublyLinkedList<T>::InsertionSort() {
+	if (length < 2)
+		return;
+	
 	Node *node = head->next;
 
 	while (node) {
